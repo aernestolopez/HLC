@@ -1,11 +1,11 @@
 <?php
 include './conexion/conexion.php';
-session_start();
+
 /* Si el usuario hace clic en entrar se obtiene
 el usuario y la contraseña */
 if(isset($_POST['entrar'])){
   $user=$conecta->real_escape_string($_POST['usuario']);
-  $pass=$conecta->real_escape_string($_POST['contrasenia']);
+  $pass=$conecta->real_escape_string(md5($_POST['contrasenia']));
   
   //Inyeccion SQL.
   $consulta="SELECT * FROM usuario WHERE nick = '$user' and contrasenia = '$pass'";
@@ -19,16 +19,24 @@ if(isset($_POST['entrar'])){
     }
     $resultado->close();
   }
-  $conecta->close();
+  
   //Comprobamos que los datos son válidos
   if(isset($user) && isset($pass)){
     if($user==$userCorrecto && $pass==$passCorrecto){
       $_SESSION['login']=TRUE;
       $_SESSION['nick']=$usuario;
+      //creamos la sesion si los datos son válidos
+      session_start();
+      //obtenemos el id de la sesion
+      $id=session_id();
+      //Creamos un Update para poder añadir el id de la sesion a la base de datos
+      $consulta2= "UPDATE usuario SET sesion='$id'";
+      $conecta->query($consulta2);
       header("location:home.php");
     }else{
      header("location:login.html");
     }
   }
+  $conecta->close();
 }
 ?>

@@ -17,9 +17,7 @@
     />
     <link rel="stylesheet" href="./estilos.css"/>
   </head>
-  <body class="d-flex justify-content-center align-items-center vh-100">
-
- 
+  <body class="d-flex justify-content-center align-items-center vh-100"> 
     <div
       class="bg-white p-5 rounded-5 text-secondary shadow"
       style="width: 25rem"
@@ -31,8 +29,8 @@
           style="height: 7rem"
         />
       </div>
-      <form action="./verificar.php" method="post">
-      <div class="text-center fs-1 fw-bold">Bienvenido/a de nuevo</div>
+      <form action="./crear.php" method="post">
+      <div class="text-center fs-1 fw-bold">Crear Cuenta</div>
       <div class="input-group mt-4">
         <div class="input-group-text bg-info">
           <img
@@ -62,23 +60,25 @@
           type="password"
           placeholder="Contraseña"
         />
-      
-      </div>
-      <div class="d-flex justify-content-around mt-1">
-        <div class="d-flex align-items-center gap-1">
-          <input class="form-check-input" type="checkbox" name="recordar"/>
-          <div class="pt-1" style="font-size: 0.9rem">Recuérdame</div>
-        </div>
+        <div class="input-group mt-1">
+            <div class="input-group-text bg-info">
+              <img
+                src="./img/password-icon.svg"
+                alt="password-icon"
+                style="height: 1rem"
+              />
+            </div>
+        <input
+        class="form-control"
+          name="verificarContrasenia"
+          type="password"
+          placeholder="Verificar Contraseña"
+          />
+
       </div>
       <input class="btn btn-primary text-white w-100 mt-4 fw-semibold shadow-sm" 
-      type="submit" value="Iniciar Sesión" name="entrar">
+      type="submit" value="Crear Cuenta" name="entrar">
       </input>
       </form>
-      <div class="d-flex gap-1 justify-content-center mt-1">
-        <div>¿No tienes cuenta?</div>
-        <a href="./singup.html" class="text-decoration-none text-info fw-semibold"
-          >Registrarse</a
-        >
-      </div>
   </body>
 </html>
