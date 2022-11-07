@@ -23,8 +23,6 @@ if(isset($_POST['entrar'])){
   //Comprobamos que los datos son válidos
   if(isset($user) && isset($pass)){
     if($user==$userCorrecto && $pass==$passCorrecto){
-      $_SESSION['login']=TRUE;
-      $_SESSION['nick']=$usuario;
       //creamos la sesion si los datos son válidos
       session_start();
       //obtenemos el id de la sesion
