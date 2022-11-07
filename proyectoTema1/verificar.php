@@ -27,7 +27,7 @@ if(isset($_POST['entrar'])){
       $_SESSION['nick']=$usuario;
       header("location:home.php");
     }else{
-      echo "Los datos no son válidos";
+     header("location:login.html");
     }
   }
 }
