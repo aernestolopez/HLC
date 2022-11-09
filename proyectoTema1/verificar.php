@@ -1,5 +1,5 @@
 <?php
-include './conexion/conexion.php';
+require './conexion/conexion.php';
 
 /* Si el usuario hace clic en entrar se obtiene
 el usuario y la contraseña */
@@ -28,7 +28,7 @@ if(isset($_POST['entrar'])){
       //obtenemos el id de la sesion
       $id=session_id();
       //Creamos un Update para poder añadir el id de la sesion a la base de datos
-      $consulta2= "UPDATE usuario SET sesion='$id'";
+      $consulta2= "UPDATE usuario SET sesion='$id' WHERE nick='$userCorrecto'";
       $conecta->query($consulta2);
       header("location:home.php");
     }else{

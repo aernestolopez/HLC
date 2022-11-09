@@ -1,5 +1,5 @@
 <?php
-include './conexion/conexion.php';
+require './conexion/conexion.php';
 /* Si el usuario hace clic en entrar se obtiene
 el usuario y la contraseña */
 if(isset($_POST['entrar'])){

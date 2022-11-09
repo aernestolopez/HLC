@@ -8,7 +8,7 @@ $usuario=$config['usuario'];
 $password=$config['password'];
 $bd=$config['bd'];
 //Nos conectamos a la base de datos
-$conecta=mysqli_connect($servidor, $usuario, $password, $bd);
+$conecta=new mysqli($servidor, $usuario, $password, $bd);
 if($conecta->connect_error){
     die("Error al conectar la base de datos".$conecta->connect_error);
 }
