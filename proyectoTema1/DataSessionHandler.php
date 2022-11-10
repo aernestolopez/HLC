@@ -42,11 +42,5 @@ class DataSessionHandler implements SessionHandlerInterface{
         return file_put_contents($this->savePath."sess_$id", $data) === false ? false : true;
     }
 }
-$sh = new MySessionHandler();
-session_set_save_handler($sh,false);
-session_start();
-
-$_SESSION["instante"]=time();
-$_SESSION["prueba"]="2dam";
 
 ?>

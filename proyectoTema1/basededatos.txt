@@ -1,0 +1,10 @@
+CREATE DATABASE login2;
+USE login2;
+CREATE TABLE usuario(
+nick VARCHAR (255) PRIMARY KEY,
+contrasenia VARCHAR(255),
+perfil VARCHAR(255),
+sesion VARCHAR(255)
+);
+
+INSERT INTO usuario (nick, contrasenia) VALUES ('rafa', md5('123'));

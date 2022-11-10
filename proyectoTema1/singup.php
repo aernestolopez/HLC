@@ -1,3 +1,47 @@
+<?php
+require './conexion/conexion.php';
+$error='';
+/* Si el usuario hace clic en entrar se obtiene
+el usuario y la contraseña */
+if(isset($_POST['entrar'])){
+    //Obtenemos los datos introducidos
+    $user=($_POST['usuario']);
+    //Obtenemos la contraseña sin encriptar
+    $passSin=($_POST['contrasenia']);
+    $pass=(md5($_POST['contrasenia']));
+    //Obtenemos la contraseña sin encriptar
+    $pass2Sin=($_POST['verificarContrasenia']);
+    $pass2=(md5($_POST['verificarContrasenia']));
+    //Verificamos que las contraseñas sin encriptar tengan una longitud de 8 o mas caracteres 
+    if(strlen($passSin)>=8 && strlen($pass2Sin)>=8){
+        //Si las constraseñas no coinciden se muestra un error
+        if(strcmp($pass, $pass2)!=0){
+        $error="Error de contraseña, no coinciden";
+        }else{
+            $consulta="SELECT * FROM usuario WHERE nick = '$user'";
+            //Obtenemos los datos de la base de datos
+            if($resultado = $conecta->query($consulta)){
+            while($row = $resultado->fetch_array()){
+            $userCorrecto=$row['nick'];
+            }
+            if($userCorrecto!=$user){
+            //Si todo ha ido bien se inserta en la base de datos estos valores
+            $consulta="INSERT INTO usuario (nick, contrasenia) VALUES('$user', '$pass')";
+            $conecta->query($consulta);
+            $conecta->close();
+            //redirigimos al usuario al login
+            header("location:login.php");
+            }else {
+                $error="El usuario ya existe";
+            }
+        }
+    }
+    }else{
+         $error="Error de contraseña, debe tener 8 caracteres o más";
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -26,12 +70,12 @@
           alt="login-icon"
           style="height: 7rem"/>
       </div>
-      <form action="./crear.php" method="post">
+      <form action="" method="post">
       <div class="text-center fs-1 fw-bold">Crear Cuenta</div>
       <div class="input-group mt-4">
-        <div class="input-group-text bg-info">
+        <div class="input-group-text bg-light">
           <img
-            src="./img/username-icon.svg"
+            src="./img/usuario.png"
             alt="username-icon"
             style="height: 1rem"/>
         </div>
@@ -42,9 +86,9 @@
           placeholder="Usuario"/>
       </div>
       <div class="input-group mt-1">
-        <div class="input-group-text bg-info">
+        <div class="input-group-text bg-light">
           <img
-            src="./img/password-icon.svg"
+            src="./img/pass.png"
             alt="password-icon"
             style="height: 1rem"/>
         </div>
@@ -54,9 +98,9 @@
           type="password"
           placeholder="Contraseña"/>
         <div class="input-group mt-1">
-            <div class="input-group-text bg-info">
+            <div class="input-group-text bg-light">
               <img
-                src="./img/password-icon.svg"
+                src="./img/pass.png"
                 alt="password-icon"
                 style="height: 1rem"/>
             </div>
@@ -66,12 +110,15 @@
           type="password"
           placeholder="Verificar Contraseña"/>
       </div>
+      <?php if(!empty($error)): ?>
+        <p style="color:red"><?=$error?></p>
+        <?php endif; ?>
       <input class="btn btn-primary text-white w-100 mt-4 fw-semibold shadow-sm" 
       type="submit" value="Crear Cuenta" name="entrar">
       </input>
       <div class="d-flex gap-1 justify-content-center mt-1">
         <div>¿Tienes Cuenta?</div>
-        <a href="./login.html" class="text-decoration-none text-info fw-semibold">
+        <a href="./login.php" class="text-decoration-none text-info fw-semibold">
           Inicia Sesión
         </a>
       </div>
