@@ -18,28 +18,30 @@ if(isset($_POST['entrar'])){
         if(strcmp($pass, $pass2)!=0){
         $error="Error de contraseña, no coinciden";
         }else{
-            $consulta="SELECT * FROM usuario WHERE nick = '$user'";
-            //Obtenemos los datos de la base de datos
-            if($resultado = $conecta->query($consulta)){
-            while($row = $resultado->fetch_array()){
-            $userCorrecto=$row['nick'];
-            }
-            if($userCorrecto!=$user){
+              $consulta=$conecta->prepare('SELECT nick FROM usuario WHERE nick = :nick');
+              $consulta->bindParam(':nick',$user);
+              $consulta->execute();
+              $resultado=$consulta->fetch(PDO::FETCH_ASSOC);
+            if(strcmp($resultado['nick'],$user)!=0){
             //Si todo ha ido bien se inserta en la base de datos estos valores
-            $consulta="INSERT INTO usuario (nick, contrasenia) VALUES('$user', '$pass')";
-            $conecta->query($consulta);
-            $conecta->close();
-            //redirigimos al usuario al login
-            header("location:login.php");
+            $consultaInsert="INSERT INTO usuario (nick, contrasenia) VALUES(:nick , :contrasenia)";
+            $resultado= $conecta->prepare($consultaInsert);
+            $resultado->bindParam(':nick', $_POST['usuario']);
+            $resultado->bindParam(':contrasenia', $pass);
+            if($resultado->execute()){
+              //redirigimos al usuario al login
+              header("location:login.php");
+            }else{
+              $error="Error de verificacion";
+            }
             }else {
                 $error="El usuario ya existe";
             }
         }
-    }
     }else{
-         $error="Error de contraseña, debe tener 8 caracteres o más";
+      $error="Error de contraseña, debe tener 8 caracteres o más";
+ }
     }
-}
 ?>
 
 <!DOCTYPE html>

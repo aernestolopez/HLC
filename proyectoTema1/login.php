@@ -8,36 +8,18 @@ if(isset($_POST['entrar'])){
   $pass=(md5($_POST['contrasenia']));
   
   //Inyeccion SQL.
-  $consulta="SELECT * FROM usuario WHERE nick = '$user' and contrasenia = '$pass'";
-  
-  //Obtenemos los datos de la base de datos
-  if($resultado = $conecta->query($consulta)){
-    while($row = $resultado->fetch_array()){
-      $userCorrecto=$row['nick'];
-      $passCorrecto=$row['contrasenia'];
-
-    }
-    //cerramos la conexion
-    $resultado->close();
-  }
-  
-  //Comprobamos que los datos son válidos
-  if(isset($user) && isset($pass)){
-    if($user==$userCorrecto && $pass==$passCorrecto){
-      //creamos la sesion si los datos son válidos
-      session_start();
-      $_SESSION['prueba'];
-      //obtenemos el id de la sesion
-      $id=session_id();
-      //Creamos un Update para poder añadir el id de la sesion a la base de datos
-      $consulta2= "UPDATE usuario SET sesion='$id' WHERE nick='$userCorrecto'";
-      $conecta->query($consulta2);
-      header("location:home.php");
+  $consulta=$conecta->prepare('SELECT nick, contrasenia FROM usuario WHERE nick = :nick');
+  $consulta->bindParam(':nick',$_POST['usuario']);
+  $consulta->execute();
+  $resultado=$consulta->fetch(PDO::FETCH_ASSOC);
+  //Comprobamos los datos
+  if (isset($resultado['nick'])) {
+    if ($pass==$resultado['contrasenia']) {
+        header('Location:home.php');
     }else{
-     $error='Los datos no son válidos';
+      $error='Los datos no son válidos';
     }
   }
-  $conecta->close();
 }
 ?>
 <!DOCTYPE html>

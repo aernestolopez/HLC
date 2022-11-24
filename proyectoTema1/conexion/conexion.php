@@ -8,8 +8,9 @@ $usuario=$config['usuario'];
 $password=$config['password'];
 $bd=$config['bd'];
 //Nos conectamos a la base de datos
-$conecta=new mysqli($servidor, $usuario, $password, $bd);
-if($conecta->connect_error){
-    die("Error al conectar la base de datos".$conecta->connect_error);
+try{
+$conecta=new PDO("mysql:host=$servidor;dbname=$bd",$usuario,$password);
+}catch(PDOException $e){
+    die('Conection Failed: '.$e->getMessage());
 }
 ?>
