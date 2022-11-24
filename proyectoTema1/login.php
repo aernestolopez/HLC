@@ -15,6 +15,13 @@ if(isset($_POST['entrar'])){
   //Comprobamos los datos
   if (isset($resultado['nick'])) {
     if ($pass==$resultado['contrasenia']) {
+      //Creamos la sesion si todo ha ido bien y la almacenamos
+      session_start();
+      $id=session_id();
+      $_SESSION["sesion"]=session_id();
+      $sql = "UPDATE usuario SET sesion=? WHERE nick=?";
+      $stmt= $conecta->prepare($sql);
+      $stmt->execute([$id, $_POST['usuario']]);
         header('Location:home.php');
     }else{
       $error='Los datos no son válidos';
