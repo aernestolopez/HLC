@@ -10,17 +10,23 @@ $stmt->execute();
 $elresul = $stmt->fetch(PDO::FETCH_ASSOC);
 $nombre=$elresul['nick'];
 //echo $nombre;
+/*$sql = "SELECT images FROM images WHERE nick=:nick";
+$query = $conecta->prepare($sql);
+$query->bindParam(":nick", $nombre);
+$query->execute();
+$result=$query->fetch(PDO::FETCH_ASSOC);*/
 
 if(isset($_POST["submit"])){
 
     //TODO id de la base de datos nick conseguido mediante la id de sesion
 
-    $check = getimagesize($_FILES["image"]["tmp_name"]);
-    if($check !== false){
-        $image = $_FILES['image']['tmp_name'];
-        $imgContent = addslashes(file_get_contents($image));
+    if(isset($_FILES['image'])){
+        $imagentemporal = $_FILES['image']['tmp_name'];
+        $fp=fopen($imagentemporal,'r+b');
+        $data=fread($fp,filesize($imagentemporal));
+        fclose($fp);
         $dataTime = date("Y-m-d H:i:s");
-        
+
 
         $select=("SELECT * FROM images WHERE nick=:nick");
         $sentencia=$conecta->prepare($select);
@@ -31,7 +37,7 @@ if(isset($_POST["submit"])){
         //se inserta la imagen en la bbdd
         $result= $conecta->prepare("INSERT INTO images VALUES (:nick, :imagen, :created)");
         $result->bindParam(':nick', $nombre);
-        $result->bindParam(':imagen', $imgContent);
+        $result->bindParam(':imagen', $data);
         $result->bindParam(':created', $dataTime);
         $result->execute();
         if($result->rowCount()>0){
@@ -40,7 +46,7 @@ if(isset($_POST["submit"])){
         }else{
             $update=("UPDATE images SET images=? WHERE nick=?");
             $stmt2=$conecta->prepare($update);
-            $stmt2->execute([$imgContent, $nombre]);
+            $stmt2->execute([$data, $nombre]);
             $update2=("UPDATE images SET created=? WHERE nick=?");
             $stmt3=$conecta->prepare($update2);
             $stmt3->execute([$dataTime, $nombre]);
@@ -50,7 +56,6 @@ if(isset($_POST["submit"])){
         echo "Seleccione una imagen a subir";
     }
 }
-
 if(isset($_POST["borrar"])){
 $drop=("DELETE FROM usuario WHERE nick=?");
 $borrar=$conecta->prepare($drop);
@@ -58,8 +63,13 @@ $borrar->execute([$nombre]);
 $drop2=("DELETE FROM images WHERE nick=?");
 $borrar2=$conecta->prepare($drop2);
 $borrar2->execute([$nombre]);
+session_unset();
+session_destroy();
 header("location:login.php");
 }
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -80,6 +90,7 @@ header("location:login.php");
   <title>Editar Usuario</title>
 </head>
 <body>
+<img src="obtenerimg.php?nombre=<?=$nombre?>">
 <nav class="navbar navbar-expand navbar-light bg-light">
   <div class="container-fluid">
     <div class="navbar-brand">
@@ -87,13 +98,13 @@ header("location:login.php");
     </div>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      <a class="nav-item nav-link" href="#">Home <span class="sr-only"></span></a>
+      <a class="nav-item nav-link" href="./home.php">Home <span class="sr-only"></span></a>
     </div>
   </div>
     <ul class="nav navbar-nav navbar-right">
       <li>
         <a class="nav-item nav-link active" href="./indexup.php">
-        <span class=""></span> Sign Up</a>
+        <span class=""><img"" alt=""></span> Sign Up</a>
     </li>
     </ul>
   </div>

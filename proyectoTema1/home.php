@@ -33,7 +33,7 @@ $id=$_SESSION['sesion'];
     </div>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      <a class="nav-item nav-link active" href="#">Home <span class="sr-only"></span></a>
+      <a class="nav-item nav-link active" href="./home.php">Home <span class="sr-only"></span></a>
     </div>
   </div>
     <ul class="nav navbar-nav navbar-right">
