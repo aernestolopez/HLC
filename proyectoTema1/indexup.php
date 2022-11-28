@@ -1,4 +1,5 @@
 <?php
+$mensaje='';
 require './conexion/conexion.php';
 session_start();
 $id=$_SESSION['sesion'];
@@ -10,23 +11,19 @@ $stmt->execute();
 $elresul = $stmt->fetch(PDO::FETCH_ASSOC);
 $nombre=$elresul['nick'];
 //echo $nombre;
-/*$sql = "SELECT images FROM images WHERE nick=:nick";
-$query = $conecta->prepare($sql);
-$query->bindParam(":nick", $nombre);
-$query->execute();
-$result=$query->fetch(PDO::FETCH_ASSOC);*/
 
 if(isset($_POST["submit"])){
 
-    //TODO id de la base de datos nick conseguido mediante la id de sesion
-
-    if(isset($_FILES['image'])){
+    
+    $permitidos = array("image/jpg", "image/jpeg", "image/gif", "image/png");
+    $limite_kb = 16384;
+    if(isset($_FILES['image'])&&in_array($_FILES['image']['type'], $permitidos) && $_FILES['image']['size'] <= $limite_kb * 1024){
         $imagentemporal = $_FILES['image']['tmp_name'];
         $fp=fopen($imagentemporal,'r+b');
         $data=fread($fp,filesize($imagentemporal));
         fclose($fp);
         $dataTime = date("Y-m-d H:i:s");
-
+        $tipo=$_FILES['image']['type'];
 
         $select=("SELECT * FROM images WHERE nick=:nick");
         $sentencia=$conecta->prepare($select);
@@ -35,25 +32,19 @@ if(isset($_POST["submit"])){
         $resultado=$sentencia->fetch(PDO::FETCH_ASSOC);
         if($resultado==NULL){
         //se inserta la imagen en la bbdd
-        $result= $conecta->prepare("INSERT INTO images VALUES (:nick, :imagen, :created)");
+        $result= $conecta->prepare("INSERT INTO images VALUES (:nick, :imagen, :created :tipo)");
         $result->bindParam(':nick', $nombre);
         $result->bindParam(':imagen', $data);
         $result->bindParam(':created', $dataTime);
+        $result->bindParam(':tipo', $tipo);
         $result->execute();
-        if($result->rowCount()>0){
-            echo "Se ha subido la imagen correctamente!";
-        }
         }else{
-            $update=("UPDATE images SET images=? WHERE nick=?");
+            $update=("UPDATE images SET images=? ,tipo=?, created=? WHERE nick=?");
             $stmt2=$conecta->prepare($update);
-            $stmt2->execute([$data, $nombre]);
-            $update2=("UPDATE images SET created=? WHERE nick=?");
-            $stmt3=$conecta->prepare($update2);
-            $stmt3->execute([$dataTime, $nombre]);
-            echo "Se ha subido correctamente";
+            $stmt2->execute([$data, $tipo,$dataTime,$nombre]);
         } 
     }else{
-        echo "Seleccione una imagen a subir";
+        $mensaje= "Error al subir la imagen o imagen vacia";
     }
 }
 if(isset($_POST["borrar"])){
@@ -78,6 +69,7 @@ header("location:login.php");
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./img/logo.ico">
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -86,11 +78,10 @@ header("location:login.php");
     <script src="https://code.jquery.com/jquery-1.12.4.min.js" 
     integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" 
     crossorigin="anonymous"></script>
-  <link rel="shortcut icon" href="./img/logo.ico">
+  
   <title>Editar Usuario</title>
 </head>
 <body>
-<img src="obtenerimg.php?nombre=<?=$nombre?>">
 <nav class="navbar navbar-expand navbar-light bg-light">
   <div class="container-fluid">
     <div class="navbar-brand">
@@ -104,7 +95,14 @@ header("location:login.php");
     <ul class="nav navbar-nav navbar-right">
       <li>
         <a class="nav-item nav-link active" href="./indexup.php">
-        <span class=""><img"" alt=""></span> Sign Up</a>
+        <img
+          src="obtenerimg.php?nombre=<?=$nombre?>"
+          alt="login-icon"
+          width="40 px"
+          height="40 px"
+          class="rounded-circle"
+          />
+      </div></a>
     </li>
     </ul>
   </div>
@@ -115,8 +113,11 @@ header("location:login.php");
       style="width: 25rem">
       <div class="d-flex justify-content-center">
         <img
-          src="./img/user.png"
+          src="obtenerimg.php?nombre=<?=$nombre?>"
           alt="login-icon"
+          width="130 px"
+          height="130 px"
+          class="rounded-circle"
           style="height: 7rem"/>
       </div>
       <!--nombre del usuario que inicia sesion-->
@@ -130,6 +131,9 @@ header("location:login.php");
         <input type="file" name="image"/>
         <br>
         <br>
+        <?php if(!empty($mensaje)):?>
+          <p style="color:red"><?=$mensaje?></p>
+          <?php endif;?>
         <input type="submit" name="submit" value="Subir"/>
 
         <div class="d-flex gap-1 justify-content-center mt-1">

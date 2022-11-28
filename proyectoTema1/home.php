@@ -1,8 +1,14 @@
 <?php
+require './conexion/conexion.php';
 //Obtenemos el id de sesion creada en el login
 session_start();
 $id=$_SESSION['sesion'];
-
+$sql = "SELECT nick FROM usuario WHERE sesion=:sesion";
+$stmt= $conecta->prepare($sql);
+$stmt->bindParam(":sesion", $id, PDO::PARAM_STR);
+$stmt->execute();
+$elresul = $stmt->fetch(PDO::FETCH_ASSOC);
+$nombre=$elresul['nick'];
 ?>
 
 <!DOCTYPE html>
@@ -39,7 +45,13 @@ $id=$_SESSION['sesion'];
     <ul class="nav navbar-nav navbar-right">
       <li>
         <a class="nav-item nav-link" href="./indexup.php">
-        <span class=""></span> Sign Up</a>
+        <img
+          src="obtenerimg.php?nombre=<?=$nombre?>"
+          alt="login-icon"
+          width="40 px"
+          height="40 px"
+          class="rounded-circle"
+          /></a>
     </li>
     </ul>
   </div>
@@ -47,8 +59,5 @@ $id=$_SESSION['sesion'];
   
 <h1>Si estas aqui es porque no la he liado
     </h1>
-    <?php
-    var_dump($id);
-    ?>
 </body>
 </html>
