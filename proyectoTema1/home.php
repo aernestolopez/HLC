@@ -9,6 +9,7 @@ $stmt->bindParam(":sesion", $id, PDO::PARAM_STR);
 $stmt->execute();
 $elresul = $stmt->fetch(PDO::FETCH_ASSOC);
 $nombre=$elresul['nick'];
+echo $nombre;
 ?>
 
 <!DOCTYPE html>

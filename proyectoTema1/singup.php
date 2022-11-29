@@ -6,6 +6,7 @@ el usuario y la contraseña */
 if(isset($_POST['entrar'])){
     //Obtenemos los datos introducidos
     $user=($_POST['usuario']);
+    $nickname=$_POST['nickname'];
     //Obtenemos la contraseña sin encriptar
     $passSin=($_POST['contrasenia']);
     $pass=(md5($_POST['contrasenia']));
@@ -24,10 +25,16 @@ if(isset($_POST['entrar'])){
               $resultado=$consulta->fetch(PDO::FETCH_ASSOC);
             if(strcmp($resultado['nick'],$user)!=0){
             //Si todo ha ido bien se inserta en la base de datos estos valores
-            $consultaInsert="INSERT INTO usuario (nick, contrasenia) VALUES(:nick , :contrasenia)";
+            $consultaInsert="INSERT INTO usuario (nick, contrasenia, nickname) VALUES(:nick , :contrasenia, :nickname)";
             $resultado= $conecta->prepare($consultaInsert);
             $resultado->bindParam(':nick', $_POST['usuario']);
             $resultado->bindParam(':contrasenia', $pass);
+            $resultado->bindParam('nickname', $nickname);
+            //Insertamos los datos del nuevo usuario en la tabla de fotos
+            $insertFoto="INSERT INTO images (nick) VALUE (:nick)";
+            $stmt=$conecta->prepare($insertFoto);
+            $stmt->bindParam(':nick', $_POST['usuario']);
+            $stmt->execute();
             if($resultado->execute()){
               //redirigimos al usuario al login
               header("location:login.php");
@@ -86,6 +93,19 @@ if(isset($_POST['entrar'])){
           name="usuario"
           type="text"
           placeholder="Usuario"/>
+      </div>
+      <div class="input-group mt-1">
+        <div class="input-group-text bg-light">
+          <img
+            src="./img/usuario.png"
+            alt="username-icon"
+            style="height: 1rem"/>
+        </div>
+        <input
+          class="form-control bg-light"
+          name="nickname"
+          type="text"
+          placeholder="Nickname"/>
       </div>
       <div class="input-group mt-1">
         <div class="input-group-text bg-light">

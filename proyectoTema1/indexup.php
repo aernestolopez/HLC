@@ -4,17 +4,15 @@ require './conexion/conexion.php';
 session_start();
 $id=$_SESSION['sesion'];
 //echo $id;
-$sql = "SELECT nick FROM usuario WHERE sesion=:sesion";
+$sql = "SELECT nick, nickname FROM usuario WHERE sesion=:sesion";
 $stmt= $conecta->prepare($sql);
 $stmt->bindParam(":sesion", $id, PDO::PARAM_STR);
 $stmt->execute();
 $elresul = $stmt->fetch(PDO::FETCH_ASSOC);
 $nombre=$elresul['nick'];
-//echo $nombre;
+$nickname=$elresul['nickname'];
 
 if(isset($_POST["submit"])){
-
-    
     $permitidos = array("image/jpg", "image/jpeg", "image/gif", "image/png");
     $limite_kb = 16384;
     if(isset($_FILES['image'])&&in_array($_FILES['image']['type'], $permitidos) && $_FILES['image']['size'] <= $limite_kb * 1024){
@@ -24,25 +22,15 @@ if(isset($_POST["submit"])){
         fclose($fp);
         $dataTime = date("Y-m-d H:i:s");
         $tipo=$_FILES['image']['type'];
-
-        $select=("SELECT * FROM images WHERE nick=:nick");
-        $sentencia=$conecta->prepare($select);
-        $sentencia->bindParam(":nick", $nombre);
-        $sentencia->execute();
-        $resultado=$sentencia->fetch(PDO::FETCH_ASSOC);
-        if($resultado==NULL){
-        //se inserta la imagen en la bbdd
-        $result= $conecta->prepare("INSERT INTO images VALUES (:nick, :imagen, :created :tipo)");
-        $result->bindParam(':nick', $nombre);
-        $result->bindParam(':imagen', $data);
-        $result->bindParam(':created', $dataTime);
-        $result->bindParam(':tipo', $tipo);
-        $result->execute();
-        }else{
             $update=("UPDATE images SET images=? ,tipo=?, created=? WHERE nick=?");
             $stmt2=$conecta->prepare($update);
             $stmt2->execute([$data, $tipo,$dataTime,$nombre]);
-        } 
+
+        //Cambio de nickname, al recargar la pagina se visualiza
+        $nombreCambiado=($_POST['Cambiousuario']);
+        $sentenciaUpdate=("UPDATE usuario SET nickname=? WHERE nick=?");
+        $stmt3=$conecta->prepare($sentenciaUpdate);
+        $stmt3->execute([$nombreCambiado, $nombre]);
     }else{
         $mensaje= "Error al subir la imagen o imagen vacia";
     }
@@ -58,9 +46,6 @@ session_unset();
 session_destroy();
 header("location:login.php");
 }
-
-
-
 ?>
 
 <!DOCTYPE html>
@@ -122,11 +107,17 @@ header("location:login.php");
       </div>
       <!--nombre del usuario que inicia sesion-->
       <div class="text-center fs-1 fw-bold">
-        <?php if(!empty($nombre)): ?>
-        <p><?=$nombre?></p>
+        <?php if(!empty($nickname)): ?>
+        <p><?=$nickname?></p>
         <?php endif; ?></div>
         <!--seleccion de imagen-->
       <form action="" method="post" enctype="multipart/form-data">
+        Editar nombre de usuario
+        <input
+          class="form-control bg-light"
+          name="Cambiousuario"
+          type="text"
+          placeholder=""/>
         Selecciona una imagen:
         <input type="file" name="image"/>
         <br>
@@ -137,7 +128,7 @@ header("location:login.php");
         <input type="submit" name="submit" value="Subir"/>
 
         <div class="d-flex gap-1 justify-content-center mt-1">
-        ¿Quiere borrar la cuenta?
+        <p style="color:red">¿Quiere borrar la cuenta?</p>
         <input type="submit" name="borrar" value="Borrar"/>
     </form>
       </div>
