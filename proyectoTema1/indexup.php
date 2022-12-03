@@ -3,7 +3,6 @@ $mensaje='';
 require './conexion/conexion.php';
 session_start();
 $id=$_SESSION['sesion'];
-//echo $id;
 $sql = "SELECT nick, nickname FROM usuario WHERE sesion=:sesion";
 $stmt= $conecta->prepare($sql);
 $stmt->bindParam(":sesion", $id, PDO::PARAM_STR);
@@ -25,7 +24,6 @@ if(isset($_POST["submit"])){
             $update=("UPDATE images SET images=? ,tipo=?, created=? WHERE nick=?");
             $stmt2=$conecta->prepare($update);
             $stmt2->execute([$data, $tipo,$dataTime,$nombre]);
-
         //Cambio de nickname, al recargar la pagina se visualiza
         $nombreCambiado=($_POST['Cambiousuario']);
         $sentenciaUpdate=("UPDATE usuario SET nickname=? WHERE nick=?");
@@ -117,7 +115,8 @@ header("location:login.php");
           class="form-control bg-light"
           name="Cambiousuario"
           type="text"
-          placeholder=""/>
+          value="<?=$nickname?>"
+          />
         Selecciona una imagen:
         <input type="file" name="image"/>
         <br>
@@ -133,7 +132,5 @@ header("location:login.php");
     </form>
       </div>
       </div>
-   
-      
 </body>
 </html>
